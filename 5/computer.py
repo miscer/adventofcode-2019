@@ -34,11 +34,40 @@ def run(program: List[int], input: List[int]):
                 value = get_value(program, params[0])
                 output.append(value)
 
+            elif opcode == 5:
+                value = get_value(program, params[0])
+                next = get_value(program, params[1])
+
+                if value != 0:
+                    ip = next
+
+            elif opcode == 6:
+                value = get_value(program, params[0])
+                next = get_value(program, params[1])
+
+                if value == 0:
+                    ip = next
+
+            elif opcode == 7:
+                a = get_value(program, params[0])
+                b = get_value(program, params[1])
+                out = get_address(params[2])
+
+                program[out] = 1 if a < b else 0
+
+            elif opcode == 8:
+                a = get_value(program, params[0])
+                b = get_value(program, params[1])
+                out = get_address(params[2])
+
+                program[out] = 1 if a == b else 0
+
             elif opcode == 99:
                 return output
 
             else:
                 raise Exception(f'Invalid opcode: {opcode}')
+
         except Exception as err:
             raise Exception(f'Instruction failed ({err}): {opcode}, {params}, {ip}')
 
@@ -81,6 +110,10 @@ param_counts = {
     2: 3,
     3: 1,
     4: 1,
+    5: 2,
+    6: 2,
+    7: 3,
+    8: 3,
     99: 0,
 }
 
