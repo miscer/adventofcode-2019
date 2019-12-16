@@ -4,8 +4,7 @@ from typing import List, Tuple
 Parameter = Tuple[int, int]
 
 
-def run(program: List[int], input: List[int]):
-    output = []
+def run(program: List[int]):
     ip = 0
 
     while ip < len(program):
@@ -28,11 +27,11 @@ def run(program: List[int], input: List[int]):
 
             elif opcode == 3:
                 out = get_address(params[0])
-                program[out] = input.pop(0)
+                program[out] = yield
 
             elif opcode == 4:
                 value = get_value(program, params[0])
-                output.append(value)
+                yield value
 
             elif opcode == 5:
                 value = get_value(program, params[0])
@@ -63,7 +62,7 @@ def run(program: List[int], input: List[int]):
                 program[out] = 1 if a == b else 0
 
             elif opcode == 99:
-                return output
+                return
 
             else:
                 raise Exception(f'Invalid opcode: {opcode}')
