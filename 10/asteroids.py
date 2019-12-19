@@ -1,9 +1,10 @@
+import collections
 import itertools
 import math
 import sys
 from typing import Tuple, TextIO, Set
 
-Vector = Tuple[int, int]
+Vector = Tuple[float, float]
 Map = Tuple[Vector, Set[Vector]]
 
 
@@ -39,37 +40,32 @@ def vector_multiply(a: Vector, n: int) -> Vector:
     return x * n, y * n
 
 
-def vector_shorten(a: Vector) -> Vector:
-    x, y = a
-    gcd = math.gcd(x, y)
-
-    return math.floor(x / gcd), math.floor(y / gcd)
-
-
-def within_bounds(vector: Vector, bounds: Vector) -> bool:
+def vector_magnitude(vector: Vector) -> float:
     x, y = vector
-    max_x, max_y = bounds
+    return math.sqrt(x ** 2 + y ** 2)
 
-    return 0 <= x < max_x and 0 <= y < max_y
+
+def vector_normalize(vector: Vector) -> Vector:
+    x, y = vector
+    m = vector_magnitude(vector)
+    return x / m, y / m
+
+
+def vector_round(vector: Vector, ndigits=None) -> Vector:
+    x, y = vector
+    return round(x, ndigits), round(y, ndigits)
 
 
 def count_visible_asteroids(map: Map, position: Vector) -> int:
     size, positions = map
-    others = {p for p in positions if p != position}
-    visible = others.copy()
+    groups = collections.defaultdict(list)
 
-    for other in others:
-        delta = vector_shorten(vector_subtract(other, position))
+    for other in positions:
+        if other != position:
+            direction = vector_round(vector_normalize(vector_subtract(other, position)), 7)
+            groups[direction].append(other)
 
-        for i in itertools.count(start=1):
-            obstructed = vector_add(other, vector_multiply(delta, i))
-
-            if not within_bounds(obstructed, size):
-                break
-
-            visible.discard(obstructed)
-
-    return len(visible)
+    return len(groups.keys())
 
 
 def print_visible(map: Map):
@@ -88,5 +84,6 @@ def print_visible(map: Map):
 
 map = parse_map(sys.stdin)
 size, positions = map
+
 max_visible = max(count_visible_asteroids(map, p) for p in positions)
 print(max_visible)
